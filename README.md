@@ -2,8 +2,8 @@
 A program written in C++ that helps a player aim at a target in Overwatch (includes trigger bot functionality).
 
 # How it Works
-The program uses Windows GDI to capture a screenshot. The screenshot is scanned in an attempt to find a player's health bar (pictures in Screenshot folder perfectly demonstrate this). 
-Upon finding one, the program will scan for the player's border from which it can obtain the coordinates of the player's head or body.
+The program uses Windows GDI to capture a screenshot. The screenshot is scanned in an attempt to find a player's health bar. 
+Upon finding a health bar, the program will scan for the player's border from which it can obtain the coordinates of the player's head or body.
 
 The program can then either move the cursor smoothly to the desired location so as to simulate human like movements or just snap directly to the target location. Trigger bot functionality was also implemented, however just like all other external colour recognition software, the crosshair must cross the target's border in order to fire.
 
