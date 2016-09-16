@@ -94,12 +94,12 @@ bool Screenshot::isRed(RGBQUAD &pixel)
 
 bool Screenshot::triggerBot()
 {
+	//Suggestion: calc these once (since they are consts) somewhere else rather then each time...
 	int centreWidth = width / 2;
 	int centreHeight = height / 2;
-
-	//CALCULATE THESE ONCE! not everytime tbot is called
 	float percentWidth = (0.3f * (float)width) / 100.0f; //you can use int 5 pixels as default too...
 	float percentHeight = (0.5f * (float)height) / 100.0f; // ^
+	//
 
 	int startingRow = (centreHeight - (int)percentHeight)*width;
 	int endRow = (centreHeight + (int)percentHeight)*width;
