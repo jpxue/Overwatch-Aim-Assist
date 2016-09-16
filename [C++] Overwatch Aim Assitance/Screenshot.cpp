@@ -256,7 +256,7 @@ bool Screenshot::findPlayer(int &posX, int &posY, bool headshot)
 				else
 				{
 					posX = border[0].x;
-					posY = border[0].y + 10;
+					posY = border[0].y + 5; //
 				}
 
 				if (DRAW)
