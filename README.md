@@ -13,4 +13,5 @@ The program can then either move the cursor smoothly to the desired location so 
 - Shield/Armor bars were not included in the function that calculates the width of the health bar. Should be easy to implement.
 - Program only scans for red borders which can occasionally change. Can use opencv's canny function to overcome this or scan for different border colours.
 - Mouse movements are based on a constant (0.116) which is not perfectly accurate with varying distances.
+- Trigger bot needs to bne optimised to exclude clustered pixels which are not part of a border.
 - No threading.
