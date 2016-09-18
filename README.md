@@ -1,6 +1,8 @@
 # Overwatch Aim Assistance
 A program written in C++ that helps a player aim at a target in Overwatch (includes trigger bot functionality).
 
+Demo: https://www.youtube.com/watch?v=0Su_ytp4-7I
+
 # How it Works
 The program uses Windows GDI to capture a screenshot. The screenshot is scanned in an attempt to find a player's health bar. 
 Upon finding a health bar, the program will scan for the player's border from which it can obtain the coordinates of the player's head or body.
