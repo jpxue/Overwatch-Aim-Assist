@@ -63,7 +63,8 @@ Screenshot::~Screenshot()
 
 void Screenshot::FreeMemory()
 {
-	delete[] pixels; //don't put this in destructor
+	if(pixels!=NULL)
+		delete[] pixels; //don't put this in destructor
 }
 
 bool Screenshot::isHealth(RGBQUAD &pixel) //pass by reference so to avoid re-allocating data that we already have in for loop
