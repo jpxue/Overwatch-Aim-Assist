@@ -47,8 +47,11 @@ int main(void)
 	cout << "[========= READ ME ========]" << endl;
 	cout << "Make sure that the display mode is 'BORDERLESS WINDOWED'!!!" << endl;
 	cout << "Aim assistance will work only on detection of a health bar." << endl;
-	cout << "Press 'CAPSLOCK' to terminate the program at anytime!" << endl;
-	cout << "Run the program in 'RELEASE' mode if not being used for debugging purposes." << endl << endl;
+	cout << "Press 'CAPSLOCK' to terminate the program at anytime!" << endl << endl;
+
+#ifdef _DEBUG
+	cout << "DEBUG mode detected; please run in RELEASE mode for speed!" << endl << endl;
+#endif
 
 	cout << "Scanning for Overwatch process handle.";
 	while (!recorder.isWindowRunning())
@@ -70,11 +73,7 @@ int main(void)
 
 	while (run)
 	{
-		while (!recorder.screenshotGDI(screeny))
-		{
-			cout << "Failed to capture screenshot!" << endl;
-			Sleep(500);
-		}
+		while (!recorder.screenshotGDI(screeny)) Sleep(500);
 
 		if (GetAsyncKeyState(VK_CAPITAL))
 			run = false;

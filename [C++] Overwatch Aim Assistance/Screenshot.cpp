@@ -283,6 +283,23 @@ int Screenshot::calculateMedian(vector<int> &values)
 	return median;
 }
 
+/* Checks if screenshot is black by checking a few points. */
+bool Screenshot::isScreenyBlack()
+{
+	int index = (height / 2) * width + 100;
+
+	for (int h = 100; h < height - 100; h+=10)
+	{
+		int i1 = h * width + 200;
+		int i2 = h * width + (width-200);
+		if (pixels[i1].rgbRed > 0 && pixels[i1].rgbGreen > 0 && pixels[i1].rgbBlue > 0)
+			return false;
+		if (pixels[i2].rgbRed > 0 && pixels[i2].rgbGreen > 0 && pixels[i2].rgbBlue > 0)
+			return false;
+	}
+	return true;
+}
+
 
 void Screenshot::debugDraw(int handleX, int handleY, int healthBarWidth, vector<POINT> border, int aimX, int aimY)
 {

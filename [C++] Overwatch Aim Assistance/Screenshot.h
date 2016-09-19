@@ -67,6 +67,7 @@ private:
 
 	bool isHealth(RGBQUAD &pixel);
 	bool isRed(RGBQUAD &pixel);
+	bool isScreenyBlack();
 	void debugDraw(int handleX, int handleY, int healthBarWidth, vector<POINT> border, int aimX, int aimY);
 	int calculateMedian(vector<int> &values);
 	bool isRGBEqual(RGBQUAD &r1, RGBQUAD &r2);

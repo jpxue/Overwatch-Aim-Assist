@@ -69,7 +69,6 @@ bool Capture::screenshotGDI(Screenshot &screeny)
 	int width = rekt.right - rekt.left;
 	int height = rekt.bottom - rekt.top;
 
-
 	//GDI screen capture
 	HDC hdcShot = CreateCompatibleDC(0);
 	HBITMAP hBmp = CreateCompatibleBitmap(GetDC(0), width, height);
@@ -82,10 +81,22 @@ bool Capture::screenshotGDI(Screenshot &screeny)
 	BITMAPINFO bmpInfo;
 
 	if (!GetObject(hBmp, sizeof(BITMAP), (LPSTR)&bmp))
+	{
+		cout << "Failed to capture screenshot @GetObject()" << endl;
+		ReleaseDC(hwnd, hdcShot);
+		DeleteObject(hBmp);
+		DeleteDC(hdcShot);
 		return false;
+	}
 
 	if (bmp.bmBitsPixel != 32 || bmp.bmPlanes != 1)
+	{
+		cout << "ERROR: BitsPerPixels=" << bmp.bmBitsPixel << " Planes=" << bmp.bmPlanes << endl;
+		ReleaseDC(hwnd, hdcShot);
+		DeleteObject(hBmp);
+		DeleteDC(hdcShot);
 		return false;
+	}
 	//
 
 	//Bitmap information
@@ -103,12 +114,21 @@ bool Capture::screenshotGDI(Screenshot &screeny)
 	int pixNo = bmp.bmWidth * bmp.bmHeight;
 	screeny.pixels = new RGBQUAD[pixNo];
 	if (!screeny.pixels)
+	{
+		cout << "ERROR: Allocating RGBQUAD[" << pixNo << "]" << endl;
+		ReleaseDC(hwnd, hdcShot);
+		DeleteObject(hBmp);
+		DeleteDC(hdcShot);
 		return false;
+	}
 
 	if (!GetDIBits(hdcShot, hBmp, 0, bmp.bmHeight, screeny.pixels, &bmpInfo, DIB_RGB_COLORS))
 	{
-		ReleaseDC(hwnd, hdcShot);
+		cout << "ERROR: GetDIBits!" << endl;
 		screeny.FreeMemory();
+		ReleaseDC(hwnd, hdcShot);
+		DeleteObject(hBmp);
+		DeleteDC(hdcShot);
 		return false;
 	}
 
@@ -116,12 +136,22 @@ bool Capture::screenshotGDI(Screenshot &screeny)
 	screeny.height = bmp.bmHeight;
 	screeny.length = pixNo;
 
+	if (screeny.isScreenyBlack())
+	{
+		cout << "ERROR: Screenshot is black! Please run in borderless windowed mode!!!" << endl;
+		ReleaseDC(hwnd, hdcShot);
+		DeleteObject(hBmp);
+		DeleteDC(hdcShot);
+		return false;
+	}
+
 	ReleaseDC(hwnd, hdcShot);
 	DeleteObject(hBmp);
 	DeleteDC(hdcShot);
 
 	return true;
 }
+
 
 void Capture::waitTillNextFrame(Screenshot &currentFrame)
 {
