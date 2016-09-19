@@ -49,7 +49,7 @@ void Mouse::moveTo(int x, int y)
 {
 	calibrateCoordinates(x, y);
 	mouse_event(MOUSEEVENTF_MOVE, x, y, 0, 0);
-	std::cout << x << "," << y << std::endl;// << "      pred: " << predX << "," << predY << std::endl;
+	//std::cout << x << "," << y << std::endl;// << "      pred: " << predX << "," << predY << std::endl;
 }
 
 /* Mouse click @ 0,0 */

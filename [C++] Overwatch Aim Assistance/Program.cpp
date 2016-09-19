@@ -41,6 +41,7 @@ int main(void)
 		Sleep(1000);
 	}
 	cout << endl << "Overwatch found!!!" << endl;
+	cout << "Press CAPS LOCK to terminate the program at anytime!" << endl;
 
 	recorder.switchToWindow(); //switch to overwatch
 	Sleep(1000);
@@ -60,12 +61,17 @@ int main(void)
 			run = false;
 
 		//======   TRIGGER BOT   ======//
-		////if (screeny.triggerBot())
-			//mousey.click(50);
+		//if (screeny.triggerBot())
+		//	mousey.click(50);
 
 		//======   AIMBOT   ======//
 		if (screeny.findPlayer(x, y, false)) //set to true if you aim headshots
-			mousey.moveSmoothAuto(x, y); //use moveTo for aimbot like movements
+		{
+			mousey.moveTo(x, y);
+			recorder.waitTillNextFrame(screeny); //imp to eliminate jittery movements, is not need with mouse.moveSmooth
+			
+			//mousey.moveSmoothAuto(x, y);
+		}
 			
 		while(!recorder.screenshotGDI(screeny)); //capture until true
 	}
