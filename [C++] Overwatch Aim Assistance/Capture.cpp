@@ -62,7 +62,11 @@ void Capture::switchToWindow(){
 bool Capture::screenshotGDI(Screenshot &screeny)
 {
 	HWND hwnd = FindWindowA(0, _WindowName);
-	if (hwnd == NULL) return false;
+	if (hwnd == NULL)
+	{
+		cout << "ERROR: Overwatch HWND not found!" << endl;
+		return false;
+	}
 
 	RECT rekt;
 	GetWindowRect(hwnd, &rekt);
