@@ -29,12 +29,12 @@ Capture::~Capture()
 
 bool Capture::isWindowRunning()
 {
-	HWND hwnd = FindWindow(0, _WindowName);
+	HWND hwnd = FindWindowA(0, _WindowName);
 	return (hwnd != NULL);
 }
 
 int Capture::getWidth() {
-	HWND hwnd = FindWindow(0, _WindowName);
+	HWND hwnd = FindWindowA(0, _WindowName);
 	if (hwnd == NULL) return 0;
 
 	RECT rekt;
@@ -43,7 +43,7 @@ int Capture::getWidth() {
 }
 
 int Capture::getHeight(){
-	HWND hwnd = FindWindow(0, _WindowName);
+	HWND hwnd = FindWindowA(0, _WindowName);
 	if (hwnd == NULL) return 0;
 
 	RECT rekt;
@@ -52,7 +52,7 @@ int Capture::getHeight(){
 }
 
 void Capture::switchToWindow(){
-	HWND hwnd = FindWindow(0, _WindowName);
+	HWND hwnd = FindWindowA(0, _WindowName);
 	if(hwnd!=NULL) SwitchToThisWindow(hwnd, false);
 }
 
@@ -61,7 +61,7 @@ void Capture::switchToWindow(){
    Return trype T/F indicates whether method was successful or not. */
 bool Capture::screenshotGDI(Screenshot &screeny)
 {
-	HWND hwnd = FindWindow(0, _WindowName);
+	HWND hwnd = FindWindowA(0, _WindowName);
 	if (hwnd == NULL) return false;
 
 	RECT rekt;
