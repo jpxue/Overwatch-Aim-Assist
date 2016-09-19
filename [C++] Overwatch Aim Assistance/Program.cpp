@@ -32,7 +32,7 @@ bool Headshots = false; //Should we aim at the head?
 
 //======== Trigger Bot Settings ========//
 bool Triggerbot = false; //Should we enable the trigger bot?
-int BurstShootTime = 333; //Amount of time to hold left click in ms. Varies depending on champion being used.
+int BurstShootTime = 100; //Amount of time to hold left click in ms. Varies depending on champion being used.
 
 int main(void)
 {
@@ -68,9 +68,14 @@ int main(void)
 	int x, y;
 	bool run = true;
 
-	recorder.screenshotGDI(screeny);
 	while (run)
 	{
+		while (!recorder.screenshotGDI(screeny))
+		{
+			cout << "Failed to capture screenshot!" << endl;
+			Sleep(500);
+		}
+
 		if (GetAsyncKeyState(VK_CAPITAL))
 			run = false;
 
@@ -96,8 +101,6 @@ int main(void)
 			//if (Triggerbot)
 				//mousey.click(BurstShootTime);
 		}
-			
-		while (!recorder.screenshotGDI(screeny)) Sleep(100);  //Capture a new screeny until true
 	}
 
 	screeny.FreeMemory();
@@ -105,4 +108,9 @@ int main(void)
 	cout << "Press 'Enter' to close!";
 	cin.ignore();
 	return 0;
+}
+
+void printScreenyNotFound()
+{
+
 }

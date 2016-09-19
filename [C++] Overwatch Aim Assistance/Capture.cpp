@@ -98,22 +98,23 @@ bool Capture::screenshotGDI(Screenshot &screeny)
 	bmpInfo.bmiHeader.biSizeImage = 0;
 	//
 
-	screeny.FreeMemory(); //We are overwriting same chunk each time
+	screeny.FreeMemory();
 
 	int pixNo = bmp.bmWidth * bmp.bmHeight;
-	RGBQUAD* pix = new RGBQUAD[pixNo];
-	if (!pix)
-		return false; //Malloc failed aqeva
+	screeny.pixels = new RGBQUAD[pixNo];
+	if (!screeny.pixels)
+		return false;
 
-	if (!GetDIBits(hdcShot, hBmp, 0, bmp.bmHeight, pix, &bmpInfo, DIB_RGB_COLORS))
+	if (!GetDIBits(hdcShot, hBmp, 0, bmp.bmHeight, screeny.pixels, &bmpInfo, DIB_RGB_COLORS))
 	{
 		ReleaseDC(hwnd, hdcShot);
-		delete[] pix;
+		screeny.FreeMemory();
 		return false;
 	}
-	//
-	
-	screeny = Screenshot(bmp.bmWidth, bmp.bmHeight, pixNo, pix, true);
+
+	screeny.width = bmp.bmWidth;
+	screeny.height = bmp.bmHeight;
+	screeny.length = pixNo;
 
 	ReleaseDC(hwnd, hdcShot);
 	DeleteObject(hBmp);

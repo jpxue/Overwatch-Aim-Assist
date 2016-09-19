@@ -57,6 +57,7 @@ public:
 
 class Screenshot
 {
+	friend class Capture;
 	friend class Midline;
 private:
 	const bool DRAW = false; //Draws filtered image to console
@@ -71,8 +72,6 @@ private:
 	bool isRGBEqual(RGBQUAD &r1, RGBQUAD &r2);
 
 public:
-	Screenshot(int sWidth, int sHeight, int sLength, RGBQUAD *sPixels, bool pointToSPixels);
-	Screenshot(Screenshot sc, bool pointToSPixels);
 	Screenshot();
 	~Screenshot();
 

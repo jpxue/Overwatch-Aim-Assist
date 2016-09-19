@@ -23,36 +23,6 @@
 		Screenshot Implementation Code
 */
 
-Screenshot::Screenshot(int sWidth, int sHeight, int sLength, RGBQUAD *sPixels, bool pointToSPixels)
-{
-	width = sWidth;
-	height = sHeight;
-	length = sLength;
-
-	if(pointToSPixels)
-		pixels = sPixels;
-	else
-	{
-		pixels = new RGBQUAD[length];
-		memcpy(pixels, sPixels, length*(sizeof(RGBQUAD))); //copying a struct not class otherwise use std::copy
-	}
-}
-
-Screenshot::Screenshot(Screenshot sc, bool pointToSPixels)
-{
-	width = sc.width;
-	height = sc.height;
-	length = sc.length;
-
-	if (pointToSPixels)
-		pixels = sc.pixels;
-	else
-	{
-		pixels = new RGBQUAD[length];
-		memcpy(pixels, sc.pixels, length*(sizeof(RGBQUAD))); //copying a struct not class otherwise use std::copy
-	}
-}
-
 Screenshot::Screenshot()
 {
 }
@@ -69,7 +39,7 @@ void Screenshot::FreeMemory()
 	}
 }
 
-bool Screenshot::isHealth(RGBQUAD &pixel) //pass by reference so to avoid re-allocating data that we already have in for loop
+bool Screenshot::isHealth(RGBQUAD &pixel) //pass by reference so to avoid re-allocating. Is probably still done by "return value optimization" but not sure.
 {
 	if (pixel.rgbRed == HEALTH.r && pixel.rgbBlue == HEALTH.b && pixel.rgbGreen == HEALTH.g)
 		return true;
@@ -97,7 +67,7 @@ bool Screenshot::isRed(RGBQUAD &pixel)
 
 bool Screenshot::triggerBot()
 {
-	//Suggestion: calc these once (since they are consts) somewhere else rather then each time...
+	//Suggestion: calc these once (since they are essentially consts) somewhere else rather then each time...
 	int centreWidth = width / 2;
 	int centreHeight = height / 2;
 	float percentWidth = (0.3f * (float)width) / 100.0f; //you can use int 5 pixels as default too...

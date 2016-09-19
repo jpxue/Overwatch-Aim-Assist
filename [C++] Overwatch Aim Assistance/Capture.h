@@ -26,6 +26,7 @@
 // Takes a screenshot and saves it inside a Screenshot class lal //
 class Capture
 {
+	friend class Screenshot;
 private:
 	char *_WindowName; //Handle name of window
 
