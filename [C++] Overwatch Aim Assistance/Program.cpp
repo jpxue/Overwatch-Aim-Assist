@@ -25,29 +25,33 @@
 
 using namespace std;
 
-//======== Aim Settings ========//
+//======== Setup & Settings ========//
+char* WindowName = "Overwatch"; //IMP: if overwatch is not detected your window name is different due to language differences! 
+								//You can find your window name via this tool: https://www.mediafire.com/?c4qe6lpkw6s57cb
+
 float MouseSensitivity = 15.00f; //Change this to your sensivitiy!!!
 bool HumanLikeMovements = false; //Should we use human like mouse movements?
 bool Headshots = false; //Should we aim at the head?
 
-//======== Trigger Bot Settings ========//
 bool Triggerbot = false; //Should we enable the trigger bot?
 int BurstShootTime = 100; //Amount of time to hold left click in ms. Varies depending on champion being used.
 
 int main(void)
 {
-	Capture recorder("Overwatch");
+	Capture recorder(WindowName);
 
 	cout << "[========= SETTINGS ========]" << endl;
-	cout << "Mouse sensitivity : " << MouseSensitivity << endl;
-	cout << "Mouse movements : " << string(HumanLikeMovements ? "Human-like" : "Aimbot-like") << endl;
-	cout << "Aiming for the : " << string(Headshots ? "Head" : "Body")  << endl;
-	cout << "Trigger bot : " << string(Triggerbot ? "Enabled" : "Disabled") << endl << endl;
+	cout << "- Mouse sensitivity : " << MouseSensitivity << endl;
+	cout << "- Mouse movements : " << string(HumanLikeMovements ? "Human-like" : "Aimbot-like") << endl;
+	cout << "- Aiming for the : " << string(Headshots ? "Head" : "Body")  << endl;
+	cout << "- Trigger bot : " << string(Triggerbot ? "Enabled" : "Disabled") << endl;
+	cout << "- Window name to scan for : '" << WindowName << "'" << endl << endl;
 
 	cout << "[========= READ ME ========]" << endl;
 	cout << "Make sure that the display mode is 'BORDERLESS WINDOWED'!!!" << endl;
 	cout << "Aim assistance will work only on detection of a health bar." << endl;
-	cout << "Press 'CAPSLOCK' to terminate the program at anytime!" << endl << endl;
+	cout << "Press 'CAPSLOCK' to terminate the program at anytime!" << endl;
+	cout << "If not running an english version you need change the 'WindowName' variable, otherwise Overwatch will not be detected!" << endl << endl;
 
 #ifdef _DEBUG
 	cout << "DEBUG mode detected; please run in RELEASE mode for speed!" << endl << endl;
