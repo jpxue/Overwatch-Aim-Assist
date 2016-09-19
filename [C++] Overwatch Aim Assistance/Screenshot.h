@@ -51,7 +51,7 @@ public:
 	Midline(Screenshot &sc);
 	Midline(int sWidth, int sHeight, RGBQUAD *sPixels);
 	~Midline();
-	RGBQUAD *pixels;
+	RGBQUAD *pixels = NULL;
 };
 
 
@@ -62,7 +62,7 @@ private:
 	const bool DRAW = false; //Draws filtered image to console
 	int length; //IMP: Needs to be defined as there is no-way to find length of *pixels just from pointer to 1st element
 	int width, height;
-	RGBQUAD *pixels; //IMP: Uses GetDIBits to obtain RGBQUADs => image is inverted. Visualise via drawScreenshot(false)
+	RGBQUAD *pixels = NULL; //IMP: Uses GetDIBits to obtain RGBQUADs => image is inverted. Visualise via drawScreenshot(false)
 
 	bool isHealth(RGBQUAD &pixel);
 	bool isRed(RGBQUAD &pixel);

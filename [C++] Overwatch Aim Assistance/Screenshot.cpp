@@ -34,7 +34,7 @@ Screenshot::Screenshot(int sWidth, int sHeight, int sLength, RGBQUAD *sPixels, b
 	else
 	{
 		pixels = new RGBQUAD[length];
-		memcpy(pixels, sPixels, length*(sizeof(RGBQUAD)));
+		memcpy(pixels, sPixels, length*(sizeof(RGBQUAD))); //copying a struct not class otherwise use std::copy
 	}
 }
 
@@ -49,7 +49,7 @@ Screenshot::Screenshot(Screenshot sc, bool pointToSPixels)
 	else
 	{
 		pixels = new RGBQUAD[length];
-		memcpy(pixels, sc.pixels, length*(sizeof(RGBQUAD)));
+		memcpy(pixels, sc.pixels, length*(sizeof(RGBQUAD))); //copying a struct not class otherwise use std::copy
 	}
 }
 
@@ -63,8 +63,10 @@ Screenshot::~Screenshot()
 
 void Screenshot::FreeMemory()
 {
-	if(pixels!=NULL)
-		delete[] pixels; //don't put this in destructor
+	if (pixels) {
+		delete[] pixels;
+		pixels = NULL;
+	}
 }
 
 bool Screenshot::isHealth(RGBQUAD &pixel) //pass by reference so to avoid re-allocating data that we already have in for loop

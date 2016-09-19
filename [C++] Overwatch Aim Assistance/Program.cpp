@@ -18,7 +18,6 @@
 
 #include <iostream>
 #include <Windows.h>
-#include <ctime>
 
 #include "Capture.h"
 #include "Time.h"
@@ -26,9 +25,14 @@
 
 using namespace std;
 
+//======== Aim Settings ========//
 float MouseSensitivity = 15.00f; //Change this to your sensivitiy!!!
 bool HumanLikeMovements = false; //Should we use human like mouse movements?
 bool Headshots = false; //Should we aim at the head?
+
+//======== Trigger Bot Settings ========//
+bool Triggerbot = false; //Should we enable the trigger bot?
+int BurstShootTime = 333; //Amount of time to hold left click in ms. Varies depending on champion being used.
 
 int main(void)
 {
@@ -37,12 +41,14 @@ int main(void)
 	cout << "[========= SETTINGS ========]" << endl;
 	cout << "Mouse sensitivity : " << MouseSensitivity << endl;
 	cout << "Mouse movements : " << string(HumanLikeMovements ? "Human-like" : "Aimbot-like") << endl;
-	cout << "Aiming for the : " << string(Headshots ? "Head" : "Body")  << endl << endl;
+	cout << "Aiming for the : " << string(Headshots ? "Head" : "Body")  << endl;
+	cout << "Trigger bot : " << string(Triggerbot ? "Enabled" : "Disabled") << endl << endl;
 
-	cout << "[========= HOW TO USE & SETUP ========]" << endl;
+	cout << "[========= READ ME ========]" << endl;
 	cout << "Make sure that the display mode is 'BORDERLESS WINDOWED'!!!" << endl;
 	cout << "Aim assistance will work only on detection of a health bar." << endl;
-	cout << "Press 'CAPSLOCK' to terminate the program at anytime!" << endl << endl;
+	cout << "Press 'CAPSLOCK' to terminate the program at anytime!" << endl;
+	cout << "Run the program in 'RELEASE' mode if not being used for debugging purposes." << endl << endl;
 
 	cout << "Scanning for Overwatch process handle.";
 	while (!recorder.isWindowRunning())
@@ -69,19 +75,26 @@ int main(void)
 			run = false;
 
 		//======   TRIGGER BOT   ======//
-		//if (screeny.triggerBot())
-		//	mousey.click(50);
+		if (Triggerbot)
+		{
+			if (screeny.triggerBot())
+				mousey.click(BurstShootTime);
+		}
 
 		//======   AIMBOT   ======//
-		if (screeny.findPlayer(x, y, Headshots)) //set to true if you aim headshots
+		if (screeny.findPlayer(x, y, Headshots))
 		{
 			if(HumanLikeMovements)
 				mousey.moveSmoothAuto(x, y);
 			else
 			{
-				mousey.moveTo(x, y); //use moveSmooth for human like movements and omitt waitTillNextFrame
-				recorder.waitTillNextFrame(screeny); //eliminates mouse from 'overshoot' because the same frame is captured 2x in a row. Can be omitted if using moveSmooth, Sleep or click functions. 
+				mousey.moveTo(x, y); //use moveSmooth for human like movements and omitt waitTillNextFrame				
+				//if (!Triggerbot || (Triggerbot && BurstShootTime < 40))
+					recorder.waitTillNextFrame(screeny); //eliminates mouse from 'overshoot' because the same frame is captured 2x in a row. Can be omitted if using moveSmooth, Sleep or click functions. 
 			}
+
+			//if (Triggerbot)
+				//mousey.click(BurstShootTime);
 		}
 			
 		while (!recorder.screenshotGDI(screeny)) Sleep(100);  //Capture a new screeny until true
