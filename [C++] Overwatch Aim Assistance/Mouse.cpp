@@ -67,7 +67,7 @@ void Mouse::moveSmoothAuto(int x, int y)
 
 	if (dist < 500) //25x25
 		speed = 10;
-	if (dist > 100 && dist < 2500) //50x50
+	if (dist > 500 && dist < 2500) //50x50
 		speed = 9;
 	else if (dist > 2500 && dist < 22500) //150x150
 		speed = 9;
@@ -76,7 +76,7 @@ void Mouse::moveSmoothAuto(int x, int y)
 	else if (dist > 90000)
 		speed = 6;
 
-	std::cout << speed << "   Disp: " << dist << "         " << "xy: " << x << "," << y << std::endl;
+	//std::cout << speed << "   Disp: " << dist << "         " << "xy: " << x << "," << y << std::endl;
 	moveSmooth1(x, y, 50, speed);
 }
 

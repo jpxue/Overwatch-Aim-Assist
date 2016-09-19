@@ -26,14 +26,24 @@
 
 using namespace std;
 
-const float MouseSensitivity = 15.0f; //Change this to your sensivitiy!!!
+float MouseSensitivity = 15.00f; //Change this to your sensivitiy!!!
+bool HumanLikeMovements = false; //Should we use human like mouse movements?
+bool Headshots = false; //Should we aim at the head?
 
 int main(void)
 {
 	Capture recorder("Overwatch");
 
-	cout << "Mouse sensitivity set to: " << MouseSensitivity << "!!!" << endl;
+	cout << "[========= SETTINGS ========]" << endl;
+	cout << "Mouse sensitivity : " << MouseSensitivity << endl;
+	cout << "Mouse movements : " << string(HumanLikeMovements ? "Human-like" : "Aimbot-like") << endl;
+	cout << "Aiming for the : " << string(Headshots ? "Head" : "Body")  << endl << endl;
+
+	cout << "[========= HOW TO USE & SETUP ========]" << endl;
 	cout << "Make sure that the display mode is 'BORDERLESS WINDOWED'!!!" << endl;
+	cout << "Aim assistance will work only on detection of a health bar." << endl;
+	cout << "Press 'CAPSLOCK' to terminate the program at anytime!" << endl << endl;
+
 	cout << "Scanning for Overwatch process handle.";
 	while (!recorder.isWindowRunning())
 	{
@@ -41,12 +51,10 @@ int main(void)
 		Sleep(1000);
 	}
 	cout << endl << "Overwatch found!!!" << endl;
-	cout << "Press CAPS LOCK to terminate the program at anytime!" << endl;
-
-	recorder.switchToWindow(); //switch to overwatch
+	
+	recorder.switchToWindow(); //Switch to Overwatch
 	Sleep(1000);
-	Beep(1000, 250); //indicates that program has started
-
+	Beep(1000, 250);
 
 	//======    Main Code    ======//
 	Screenshot screeny;
@@ -65,19 +73,22 @@ int main(void)
 		//	mousey.click(50);
 
 		//======   AIMBOT   ======//
-		if (screeny.findPlayer(x, y, false)) //set to true if you aim headshots
+		if (screeny.findPlayer(x, y, Headshots)) //set to true if you aim headshots
 		{
-			mousey.moveTo(x, y);
-			recorder.waitTillNextFrame(screeny); //imp to eliminate jittery movements, is not need with mouse.moveSmooth
-			
-			//mousey.moveSmoothAuto(x, y);
+			if(HumanLikeMovements)
+				mousey.moveSmoothAuto(x, y);
+			else
+			{
+				mousey.moveTo(x, y); //use moveSmooth for human like movements and omitt waitTillNextFrame
+				recorder.waitTillNextFrame(screeny); //eliminates mouse from 'overshoot' because the same frame is captured 2x in a row. Can be omitted if using moveSmooth, Sleep or click functions. 
+			}
 		}
 			
-		while(!recorder.screenshotGDI(screeny)); //capture until true
+		while (!recorder.screenshotGDI(screeny)) Sleep(100);  //Capture a new screeny until true
 	}
 
 	screeny.FreeMemory();
-	Beep(1500, 500); //indicates that loop has terminated
+	Beep(1500, 500);
 	cout << "Press 'Enter' to close!";
 	cin.ignore();
 	return 0;

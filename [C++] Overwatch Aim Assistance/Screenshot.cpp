@@ -188,15 +188,18 @@ bool Screenshot::findPlayer(int &posX, int &posY, bool headshot)
 				return false;
 			}
 
-			int numberOfBars = 8; //IMP! FIX THIS FOR WINSTON TA RAS ZOBBI u ekk...
-			if (barWidths.size() == 1) //estimation based on 1 bar is inaccurate if that 1 bar is not @ full HP
-				barWidth = 150;
-			if (barWidths.size() > 3)
-				barWidth = calculateMedian(barWidths);
-			else
+			int numberOfBars = 8; //IMP! FIX THIS FOR CHAMPS WITH MORE THAN 8 HEALTHBARS! (WINSTON, ROADHOG etc...)
+			int healthBarWidth = 150;
+			bool calculateBarWidth = true;
+
+			if (barWidths.size() == 2) //1st bar should be accurate
 				barWidth = barWidths[0];
-			int healthBarWidth = (barWidth * numberOfBars) + ((numberOfBars-1)*2); //health bar area + empty pixel areas in between 
-			//
+			else if (barWidths.size() >= 3) //if we have 3 or more bars the median value should be accurate
+				barWidth = calculateMedian(barWidths); //omits outliers
+			else if (barWidths.size() <= 1) //we will assume that the healthBarWidth is 150; not a major problem because we will also scan an additional 1/3 healthBarWidth in -1 and +1 direction
+				calculateBarWidth = false;
+
+			healthBarWidth = calculateBarWidth ? (barWidth * numberOfBars) + ((numberOfBars - 1) * 2) : 150;
 
 			//Obtain all border points lying under the health bar
 			vector<POINT> border;
@@ -207,7 +210,7 @@ bool Screenshot::findPlayer(int &posX, int &posY, bool headshot)
 
 			bool foundAnyRedsBefore = false;
 			bool foundRedInRow = false;	
-			int toleranceNoReds = (height * 5) / 100; //4% of image height
+			int toleranceNoReds = (height * 5) / 100; //5% of image height
 
 			//Assign these to 0 before we add to them.
 			posX = 0;
@@ -256,7 +259,7 @@ bool Screenshot::findPlayer(int &posX, int &posY, bool headshot)
 				else
 				{
 					posX = border[0].x;
-					posY = border[0].y + 5; //
+					posY = border[0].y + 10; //IMP +10 so we aim a little bit further down then the outline of the scalp head, this should be based on distance though!
 				}
 
 				if (DRAW)
