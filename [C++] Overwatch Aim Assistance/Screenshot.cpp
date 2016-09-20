@@ -79,7 +79,7 @@ bool Screenshot::triggerBot()
 
 	for (int row = startingRow; row < endRow; row += width)
 	{
-		for (int col = centreWidth - percentWidth; col < centreWidth + percentWidth; col++)
+		for (int col = centreWidth - (int)percentWidth; col < centreWidth + (int)percentWidth; col++)
 		{
 			int index = row  + col;
 			//if (index < length && index > 0)
