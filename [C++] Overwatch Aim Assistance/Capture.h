@@ -28,7 +28,8 @@ class Capture
 {
 	friend class Screenshot;
 private:
-	char *_WindowName; //Handle name of window
+	char *WindowName; //Handle name of window
+	void release(HWND &hwnd, HDC &hdc, HDC &captureDC, HBITMAP &hBmp);
 
 public:
 	Capture(char *windowName);

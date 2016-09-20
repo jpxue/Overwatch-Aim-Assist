@@ -108,7 +108,7 @@ int main(void)
 		}
 
 		cout << t.timerStop() << "ms" << endl;
-		Sleep(1000);
+		Sleep(1);
 	}
 
 	screeny.FreeMemory();
