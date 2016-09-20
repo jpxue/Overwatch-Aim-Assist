@@ -33,8 +33,8 @@ float MouseSensitivity = 15.00f; //Change this to your sensivitiy!!!
 bool HumanLikeMovements = false; //Should we use human like mouse movements?
 bool Headshots = false; //Should we aim at the head?
 
-bool Triggerbot = false; //Should we enable the trigger bot?
-int BurstShootTime = 100; //Amount of time to hold left click in ms. Varies depending on champion being used.
+bool Triggerbot = false; //Should we enable the trigger bot? Not recommended in certain maps
+//int BurstShootTime = 100; //Amount of time to hold left click in ms. Varies depending on champion being used.
 
 int main(void)
 {
@@ -47,8 +47,9 @@ int main(void)
 	cout << "- Trigger bot : " << string(Triggerbot ? "Enabled" : "Disabled") << endl;
 	cout << "- Window name to scan for : '" << WindowName << "'" << endl << endl;
 
-	cout << "[========= READ ME ========]" << endl;
+	cout << "[========= IMPORTANT ========]" << endl;
 	cout << "Make sure that the display mode is 'BORDERLESS WINDOWED'!!!" << endl;
+	cout << "Limit FPS to 'DISPLAY BASED'!!! Completely eliminates stuttering." << endl;
 	cout << "Aim assistance will work only on detection of a health bar." << endl;
 	cout << "Press 'CAPSLOCK' to terminate the program at anytime!" << endl;
 	cout << "If not running an english version you need change the 'WindowName' variable, otherwise Overwatch will not be detected!" << endl << endl;
@@ -77,8 +78,6 @@ int main(void)
 
 	while (run)
 	{
-		Time t;
-		t.timerStart();
 		while (!recorder.screenshotGDI(screeny)) Sleep(500);
 
 		if (GetAsyncKeyState(VK_CAPITAL))
@@ -100,14 +99,14 @@ int main(void)
 			{
 				mousey.moveTo(x, y); //use moveSmooth for human like movements and omitt waitTillNextFrame				
 				//if (!Triggerbot || (Triggerbot && BurstShootTime < 40))
-					recorder.waitTillNextFrame(screeny); //eliminates mouse from 'overshoot' because the same frame is captured 2x in a row. Can be omitted if using moveSmooth, Sleep or click functions. 
+				recorder.waitTillNextFrame(screeny); //eliminates mouse from 'overshoot' because the same frame is captured 2x in a row. Can be omitted if using moveSmooth, Sleep or click functions. 
 			}
 
 			//if (Triggerbot)
 				//mousey.click(BurstShootTime);
 		}
 
-		cout << t.timerStop() << "ms" << endl;
+		
 		Sleep(1);
 	}
 
