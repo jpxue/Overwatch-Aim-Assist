@@ -20,7 +20,7 @@
 
 Capture::Capture(char *windowName)
 {
-	_WindowName = windowName;
+	WindowName = windowName;
 }
 
 Capture::~Capture()
@@ -29,12 +29,12 @@ Capture::~Capture()
 
 bool Capture::isWindowRunning()
 {
-	HWND hwnd = FindWindowA(0, _WindowName);
+	HWND hwnd = FindWindowA(0, WindowName);
 	return (hwnd != NULL);
 }
 
 int Capture::getWidth() {
-	HWND hwnd = FindWindowA(0, _WindowName);
+	HWND hwnd = FindWindowA(0, WindowName);
 	if (hwnd == NULL) return 0;
 
 	RECT rekt;
@@ -43,7 +43,7 @@ int Capture::getWidth() {
 }
 
 int Capture::getHeight(){
-	HWND hwnd = FindWindowA(0, _WindowName);
+	HWND hwnd = FindWindowA(0, WindowName);
 	if (hwnd == NULL) return 0;
 
 	RECT rekt;
@@ -52,7 +52,7 @@ int Capture::getHeight(){
 }
 
 void Capture::switchToWindow(){
-	HWND hwnd = FindWindowA(0, _WindowName);
+	HWND hwnd = FindWindowA(0, WindowName);
 	if(hwnd!=NULL) SwitchToThisWindow(hwnd, false);
 }
 
@@ -61,102 +61,77 @@ void Capture::switchToWindow(){
    Return trype T/F indicates whether method was successful or not. */
 bool Capture::screenshotGDI(Screenshot &screeny)
 {
-	HWND hwnd = FindWindowA(0, _WindowName);
+	HWND hwnd = FindWindowA(0, WindowName);
 	if (hwnd == NULL)
 	{
 		cout << "ERROR: Overwatch HWND not found!" << endl;
 		return false;
 	}
 
-	RECT rekt;
-	GetWindowRect(hwnd, &rekt);
-	int width = rekt.right - rekt.left;
-	int height = rekt.bottom - rekt.top;
+	int sWidth = GetSystemMetrics(SM_CXSCREEN);
+	int sHeight = GetSystemMetrics(SM_CYSCREEN);
 
-	//GDI screen capture
-	HDC hdcShot = CreateCompatibleDC(0);
-	HBITMAP hBmp = CreateCompatibleBitmap(GetDC(0), width, height);
-
-	SelectObject(hdcShot, hBmp);
-
-	BitBlt(hdcShot, 0, 0, width, height, GetDC(0), rekt.left, rekt.top, SRCCOPY);
-
-	BITMAP bmp;
-	BITMAPINFO bmpInfo;
-
-	if (!GetObject(hBmp, sizeof(BITMAP), (LPSTR)&bmp))
+	HDC hdc = GetDC(0);
+	HDC captureDC = CreateCompatibleDC(hdc);
+	HBITMAP hBmp = CreateCompatibleBitmap(hdc, sWidth, sHeight);
+	HGDIOBJ hOld = SelectObject(captureDC, hBmp);
+	
+	if (!BitBlt(captureDC, 0, 0, sWidth, sHeight, hdc, 0, 0, SRCCOPY | CAPTUREBLT))
 	{
-		cout << "Failed to capture screenshot @GetObject()" << endl;
-		ReleaseDC(hwnd, hdcShot);
-		DeleteObject(hBmp);
-		DeleteDC(hdcShot);
+		cout << "ERROR: bit-block transfer failed!" << endl;
+		release(hwnd, hdc, captureDC, hBmp);
 		return false;
 	}
 
-	if (bmp.bmBitsPixel != 32 || bmp.bmPlanes != 1)
-	{
-		cout << "ERROR: BitsPerPixels=" << bmp.bmBitsPixel << " Planes=" << bmp.bmPlanes << endl;
-		ReleaseDC(hwnd, hdcShot);
-		DeleteObject(hBmp);
-		DeleteDC(hdcShot);
-		return false;
-	}
-	//
+	SelectObject(captureDC, hBmp);
 
-	//Bitmap information
+	BITMAPINFO bmpInfo = { 0 };
 	bmpInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-	bmpInfo.bmiHeader.biWidth = bmp.bmWidth;
-	bmpInfo.bmiHeader.biHeight = bmp.bmHeight;
-	bmpInfo.bmiHeader.biPlanes = 1;
-	bmpInfo.bmiHeader.biBitCount = bmp.bmBitsPixel;
+	if (!GetDIBits(hdc, hBmp, 0, 0, NULL, &bmpInfo, DIB_RGB_COLORS)) //get bmpInfo
+	{
+		cout << "ERROR: Failed to get Bitmap Info." << endl;
+		release(hwnd, hdc, captureDC, hBmp);
+		return false;
+	}
 	bmpInfo.bmiHeader.biCompression = BI_RGB;
-	bmpInfo.bmiHeader.biSizeImage = 0;
-	//
 
 	screeny.FreeMemory();
 
-	int pixNo = bmp.bmWidth * bmp.bmHeight;
+	int pixNo = bmpInfo.bmiHeader.biWidth *  bmpInfo.bmiHeader.biHeight;
 	screeny.pixels = new RGBQUAD[pixNo];
 	if (!screeny.pixels)
 	{
-		cout << "ERROR: Allocating RGBQUAD[" << pixNo << "]" << endl;
-		ReleaseDC(hwnd, hdcShot);
-		DeleteObject(hBmp);
-		DeleteDC(hdcShot);
+		cout << "ERROR: Failed allocating RGBQUAD[" << pixNo << "]" << endl;
+		release(hwnd, hdc, captureDC, hBmp);
 		return false;
 	}
 
-	if (!GetDIBits(hdcShot, hBmp, 0, bmp.bmHeight, screeny.pixels, &bmpInfo, DIB_RGB_COLORS))
+	if (!GetDIBits(hdc, hBmp, 0, bmpInfo.bmiHeader.biHeight, (LPVOID)screeny.pixels, &bmpInfo, DIB_RGB_COLORS))
 	{
-		cout << "ERROR: GetDIBits!" << endl;
+		cout << "ERROR: Getting the bitmap buffer!" << endl;
 		screeny.FreeMemory();
-		ReleaseDC(hwnd, hdcShot);
-		DeleteObject(hBmp);
-		DeleteDC(hdcShot);
+		release(hwnd, hdc, captureDC, hBmp);
 		return false;
 	}
 
-	screeny.width = bmp.bmWidth;
-	screeny.height = bmp.bmHeight;
+	screeny.width = bmpInfo.bmiHeader.biWidth;
+	screeny.height = bmpInfo.bmiHeader.biHeight;
 	screeny.length = pixNo;
 
-	if (screeny.isScreenyBlack())
-	{
-		cout << "ERROR: Screenshot is black! Please run in borderless windowed mode!!!" << endl;
-		ReleaseDC(hwnd, hdcShot);
-		DeleteObject(hBmp);
-		DeleteDC(hdcShot);
-		return false;
-	}
-
-	ReleaseDC(hwnd, hdcShot);
-	DeleteObject(hBmp);
-	DeleteDC(hdcShot);
-
+	release(hwnd, hdc, captureDC, hBmp);
 	return true;
 }
 
+// Memory management for screenshot function above
+void Capture::release(HWND &hwnd, HDC &hdc, HDC &captureDC, HBITMAP &hBmp)
+{
+	ReleaseDC(hwnd, hdc);
+	DeleteObject(hBmp);
+	DeleteDC(captureDC);
+	DeleteDC(hdc);
+}
 
+// Pauses until next frame is found 
 void Capture::waitTillNextFrame(Screenshot &currentFrame)
 {
 	Midline prevFrameMidline(currentFrame);
@@ -168,6 +143,6 @@ void Capture::waitTillNextFrame(Screenshot &currentFrame)
 		if (currentFrame != prevFrameMidline)
 			newFrameLoaded = true;
 		else
-			Sleep(1);
+			Sleep(10);
 	}
 }

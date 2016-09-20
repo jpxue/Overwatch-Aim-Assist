@@ -57,7 +57,7 @@ int main(void)
 	cout << "DEBUG mode detected; please run in RELEASE mode for speed!" << endl << endl;
 #endif
 
-	cout << "Scanning for Overwatch process handle.";
+	cout << "Scanning for '" << WindowName << "' process handle (if stuck here read the comments).";
 	while (!recorder.isWindowRunning())
 	{
 		cout << ".";
@@ -77,6 +77,8 @@ int main(void)
 
 	while (run)
 	{
+		Time t;
+		t.timerStart();
 		while (!recorder.screenshotGDI(screeny)) Sleep(500);
 
 		if (GetAsyncKeyState(VK_CAPITAL))
@@ -104,6 +106,9 @@ int main(void)
 			//if (Triggerbot)
 				//mousey.click(BurstShootTime);
 		}
+
+		cout << t.timerStop() << "ms" << endl;
+		Sleep(1000);
 	}
 
 	screeny.FreeMemory();
@@ -111,9 +116,4 @@ int main(void)
 	cout << "Press 'Enter' to close!";
 	cin.ignore();
 	return 0;
-}
-
-void printScreenyNotFound()
-{
-
 }
