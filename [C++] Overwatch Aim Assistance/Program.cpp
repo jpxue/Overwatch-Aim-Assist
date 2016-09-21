@@ -30,11 +30,19 @@ char* WindowName = "Overwatch"; //IMP: if overwatch is not detected your window 
 								//You can find your window name via this tool: https://www.mediafire.com/?c4qe6lpkw6s57cb
 
 float MouseSensitivity = 15.00f; //Change this to your sensivitiy!!!
+
+bool Aimbot = true;
 bool HumanLikeMovements = false; //Should we use human like mouse movements?
 bool Headshots = false; //Should we aim at the head?
 
 bool Triggerbot = false; //Should we enable the trigger bot? Not recommended in certain maps
 int BurstShootTime = 100; //Amount of time to hold left click in ms. Varies depending on champion being used.
+
+//Virtual Keys: https://msdn.microsoft.com/en-us/library/windows/desktop/dd375731(v=vs.85).aspx
+int AimbotKey = 0x1; //VK_LBUTTON (LEFT MOUSE KEY)
+int TriggerbotKey = 0x12; //VK_MENU (ALT KEY) 
+
+int CaptureRate = 100; //How fast/slow you want the screenshots to be captured (in milliseconds)
 
 int main(void)
 {
@@ -43,8 +51,9 @@ int main(void)
 	cout << "[========= SETTINGS ========]" << endl;
 	cout << "- Mouse sensitivity : " << MouseSensitivity << endl;
 	cout << "- Mouse movements : " << string(HumanLikeMovements ? "Human-like" : "Aimbot-like") << endl;
-	cout << "- Aiming for the : " << string(Headshots ? "Head" : "Body")  << endl;
-	cout << "- Trigger bot : " << string(Triggerbot ? "Enabled" : "Disabled") << endl;
+	cout << "- Aiming for the : " << string( Headshots ? "Head" : "Body" ) << endl;
+	cout << "- Aimbot : " << string(Aimbot ? "Enabled" : "Disabled") << endl;
+	cout << "- Triggerbot : " << string(Triggerbot ? "Enabled" : "Disabled") << endl;
 	cout << "- Window name to scan for : '" << WindowName << "'" << endl << endl;
 
 	cout << "[========= IMPORTANT ========]" << endl;
@@ -77,42 +86,55 @@ int main(void)
 	bool run = true;
 
 	while (run)
-	{
-		while (!recorder.screenshotGDI(screeny)) Sleep(500);
-
+	{		
 		if (GetAsyncKeyState(VK_CAPITAL))
-			run = false;
+			run = false;	
 
 		//======   TRIGGER BOT   ======//
 		if (Triggerbot)
 		{
-			if (screeny.triggerBot())
-				mousey.click(BurstShootTime);
+			if (GetAsyncKeyState(TriggerbotKey) & 0x8000)
+			{
+				while (!recorder.screenshotGDI(screeny)) //Should probably do better logic because it does not need to be called twice per loop
+					Sleep(CaptureRate);
+
+				if (screeny.triggerBot())
+					mousey.click(BurstShootTime);
+			}
 		}
 
 		//======   AIMBOT   ======//
-		if (screeny.findPlayer(x, y, Headshots))
+		if (Aimbot)
 		{
-			if(HumanLikeMovements)
-				mousey.moveSmoothAuto(x, y);
-			else
+			if (GetAsyncKeyState(AimbotKey) & 0x8000)
 			{
-				mousey.moveTo(x, y); //use moveSmooth for human like movements and omitt waitTillNextFrame				
-				//if (!Triggerbot || (Triggerbot && BurstShootTime < 40))
-				recorder.waitTillNextFrame(screeny); //eliminates mouse from 'overshoot' because the same frame is captured 2x in a row. Can be omitted if using moveSmooth, Sleep or click functions. 
+				while (!recorder.screenshotGDI(screeny)) //Should probably do better logic because it does not need to be called twice per loop
+					Sleep(CaptureRate);
+
+				if (screeny.findPlayer(x, y, Headshots))
+				{
+					if (HumanLikeMovements)
+					{
+						mousey.moveSmoothAuto(x, y);
+					}
+					else
+					{
+						mousey.moveTo(x, y); //use moveSmooth for human like movements and omit waitTillNextFrame				
+						//if (!Triggerbot || (Triggerbot && BurstShootTime < 40))
+						recorder.waitTillNextFrame(screeny); //eliminates mouse from 'overshoot' because the same frame is captured 2x in a row. Can be omitted if using moveSmooth, Sleep or click functions. 
+					}
+				}
 			}
-
-			//if (Triggerbot)
-				//mousey.click(BurstShootTime);
 		}
-
-		
+	
 		Sleep(1);
 	}
 
 	screeny.FreeMemory();
 	Beep(1500, 500);
+
 	cout << "Press 'Enter' to close!";
 	cin.ignore();
+
 	return 0;
 }
