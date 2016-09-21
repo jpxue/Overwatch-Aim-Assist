@@ -18,6 +18,12 @@
 
 #include "Mouse.h"
 
+bool dynamicScaling = false;
+
+int aimSpeed = 7;
+int maxDistance = 2500;
+int minDistance = 250;
+
 Mouse::Mouse(int captureWidth, int captureHeight, const float sensitivity)
 {
 	screenWidth = captureWidth;
@@ -63,18 +69,26 @@ void Mouse::click(int leftDownMS)
 void Mouse::moveSmoothAuto(int x, int y)
 {
 	int dist = abs((x - centreScreenX)*(y - centreScreenY));
-	int speed = 9;
+	int speed = 0;
 
-	if (dist < 500) //25x25
-		speed = 10;
-	if (dist > 500 && dist < 2500) //50x50
-		speed = 9;
-	else if (dist > 2500 && dist < 22500) //150x150
-		speed = 9;
-	else if (dist > 22500 && dist < 90000) //300x300
-		speed = 8;
-	else if (dist > 90000)
-		speed = 6;
+        if (dynamicScaling)
+        {
+		if (dist < 500) //25x25
+			speed = 10;
+		if (dist > 500 && dist < 2500) //50x50
+			speed = 9;
+		else if (dist > 2500 && dist < 22500) //150x150
+			speed = 9;
+		else if (dist > 22500 && dist < 90000) //300x300
+			speed = 8;
+		else if (dist > 90000)
+			speed = 6;
+        }
+        else
+        {
+        	if (dist => minDistance && dist <= maxDistance) //Static aim speed and distance, IMO it's more legit because you are able to set a max distance 
+			speed = aimSpeed;
+        }
 
 	//std::cout << speed << "   Disp: " << dist << "         " << "xy: " << x << "," << y << std::endl;
 	moveSmooth1(x, y, 50, speed);
@@ -85,6 +99,9 @@ void Mouse::moveSmoothAuto(int x, int y)
    So if aimspeed is 6; time taken to move to point would be 400ms */
 void Mouse::moveSmooth1(int x, int y, int steps, int aimSpeed)
 {
+	if (aimSpeed == 0)
+		return;
+		
 	calibrateCoordinates(x, y);
 	int div = (1000 / steps);
 	int sleep = div - (aimSpeed*(div / 10));
@@ -120,6 +137,9 @@ void Mouse::moveSmooth1(int x, int y, int steps, int aimSpeed)
 Time taken is random because sleep occurs on moving 1.0f pixel. */
 void Mouse::moveSmooth2(int x, int y, int steps, int aimSpeed)
 {
+	if (aimSpeed == 0)
+		return;
+		
 	calibrateCoordinates(x, y);
 
 	float divX = (float)x / (float)steps;
