@@ -40,7 +40,7 @@ public:
 	int getWidth();
 	int getHeight();
 	void switchToWindow();
-	void waitTillNextFrame(Screenshot &currentFrame);
+	bool captureNewFrame(Screenshot &currentFrame);
 };
 
 

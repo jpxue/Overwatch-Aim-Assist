@@ -177,7 +177,7 @@ bool Screenshot::findPlayer(int &posX, int &posY, bool headshot)
 			//Obtain all border points lying under the health bar
 			vector<POINT> border;
 
-			int skipYs = 40;
+			int skipYs = 50; //use percent of screen height instead?
 			int startIndex = i - (width*skipYs);
 			int actualRow = y + skipYs;
 

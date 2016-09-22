@@ -25,20 +25,23 @@
 
 using namespace std;
 
-//======== Setup & Settings ========//
+//======================================== Setup & Settings ========================================//
 char* WindowName = "Overwatch"; //IMP: if overwatch is not detected your window name is different due to language differences! 
-								//You can find your window name via this tool: https://www.mediafire.com/?c4qe6lpkw6s57cb
+//You can find your window name via this tool: https://www.mediafire.com/?c4qe6lpkw6s57cb
 
-float MouseSensitivity = 15.00f; //Change this to your sensivitiy!!!
-bool HumanLikeMovements = false; //Should we use human like mouse movements?
-bool Headshots = false; //Should we aim at the head?
+float MouseSensitivity = 15.00f; //Change this to your sensivity.
+bool HumanLikeMovements = true; //Should we use human like mouse movements?
+int AimSpeed = 5; //Aim speed for human like movements (1-10).
+bool Headshots = true; //Should we aim at the head?
 
 bool Triggerbot = false; //Should we enable the trigger bot? Not recommended in certain maps
-int BurstShootTime = 100; //Amount of time to hold left click in ms. Varies depending on champion being used.
+int BurstShootTime = 100; //Amount of time to hold left click in ms. Varies depending on character being used.
 
-int main(void)
+int main(int argc, char* argv[])
 {
 	Capture recorder(WindowName);
+	AimSpeed = AimSpeed < 0 ? 0 : AimSpeed;
+	AimSpeed = AimSpeed > 10 ? 10 : AimSpeed;
 
 	cout << "[========= SETTINGS ========]" << endl;
 	cout << "- Mouse sensitivity : " << MouseSensitivity << endl;
@@ -55,10 +58,10 @@ int main(void)
 	cout << "If not running an english version you need change the 'WindowName' variable, otherwise Overwatch will not be detected!" << endl << endl;
 
 #ifdef _DEBUG
-	cout << "DEBUG mode detected; please run in RELEASE mode for speed!" << endl << endl;
+	cout << "DEBUG mode detected; please run in RELEASE mode for optimizations/speed!" << endl << endl;
 #endif
 
-	cout << "Scanning for '" << WindowName << "' process handle (if stuck here read the comments).";
+	cout << "Searching for window name '" << WindowName << "' (if stuck please change this according to your language).";
 	while (!recorder.isWindowRunning())
 	{
 		cout << ".";
@@ -78,13 +81,14 @@ int main(void)
 
 	while (run)
 	{
-		while (!recorder.screenshotGDI(screeny)) Sleep(500);
+		Sleep(1);
+		while(!recorder.captureNewFrame(screeny)) Sleep(500);  
 
 		if (GetAsyncKeyState(VK_CAPITAL))
 			run = false;
 
-		//======   TRIGGER BOT   ======//
-		if (Triggerbot)
+		//======   TRIGGER BOT  ======//
+		if (Triggerbot) //Only tested in training range
 		{
 			if (screeny.triggerBot())
 				mousey.click(BurstShootTime);
@@ -94,20 +98,13 @@ int main(void)
 		if (screeny.findPlayer(x, y, Headshots))
 		{
 			if(HumanLikeMovements)
-				mousey.moveSmoothAuto(x, y);
+				mousey.moveSmooth(x, y, AimSpeed);
 			else
-			{
 				mousey.moveTo(x, y); //use moveSmooth for human like movements and omitt waitTillNextFrame				
-				//if (!Triggerbot || (Triggerbot && BurstShootTime < 40))
-				recorder.waitTillNextFrame(screeny); //eliminates mouse from 'overshoot' because the same frame is captured 2x in a row. Can be omitted if using moveSmooth, Sleep or click functions. 
-			}
 
 			//if (Triggerbot)
 				//mousey.click(BurstShootTime);
 		}
-
-		
-		Sleep(1);
 	}
 
 	screeny.FreeMemory();

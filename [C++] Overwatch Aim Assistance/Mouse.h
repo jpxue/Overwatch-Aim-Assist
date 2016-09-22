@@ -40,9 +40,7 @@ private:
 public:
 	Mouse(int captureWidth, int captureHeight, const float sensitivity);
 	void moveTo(int x, int y);
-	void moveSmoothAuto(int x, int y);
-	void moveSmooth1(int x, int y, int steps, int aimSpeed);
-	void moveSmooth2(int x, int y, int steps, int aimSpeed);
+	void Mouse::moveSmooth(int x, int y, int aimSpeed);
 	void click(int leftDownMS);
 
 };

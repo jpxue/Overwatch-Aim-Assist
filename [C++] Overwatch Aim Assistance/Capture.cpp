@@ -56,7 +56,6 @@ void Capture::switchToWindow(){
 	if(hwnd!=NULL) SwitchToThisWindow(hwnd, false);
 }
 
-
 /* Captures a screenshot and saves it into screeny which is passed by reference
    Return trype T/F indicates whether method was successful or not. */
 bool Capture::screenshotGDI(Screenshot &screeny)
@@ -132,17 +131,27 @@ void Capture::release(HWND &hwnd, HDC &hdc, HDC &captureDC, HBITMAP &hBmp)
 }
 
 // Pauses until next frame is found 
-void Capture::waitTillNextFrame(Screenshot &currentFrame)
+bool Capture::captureNewFrame(Screenshot &currentFrame)
 {
+	if (!currentFrame.pixels)
+		return screenshotGDI(currentFrame);
+
 	Midline prevFrameMidline(currentFrame);
 	bool newFrameLoaded = false;
 	while (!newFrameLoaded) //Wait till new frame loads!
 	{
-		screenshotGDI(currentFrame);
+		bool captured = screenshotGDI(currentFrame);
+		if (!captured)
+			return false;
 
 		if (currentFrame != prevFrameMidline)
-			newFrameLoaded = true;
+		{
+			newFrameLoaded = true; //not necessary
+			return true;
+		}
 		else
 			Sleep(10);
 	}
+
+	return true;
 }
