@@ -29,8 +29,6 @@ Mouse::Mouse(int captureWidth, int captureHeight, const float sensitivity)
 	modifier = mouseSensitivity*constant;
 }
 
-const float PI = 3.1415927;
-
 /* Calculates actual coordinates for mouse movement based on sensitivity and a constant. */
 void Mouse::calibrateCoordinates(int &x, int &y)
 {
@@ -60,8 +58,8 @@ void Mouse::click(int leftDownMS)
 void Mouse::moveSmooth(int x, int y, int aimSpeed)
 {
 	calibrateCoordinates(x, y);
-	int pWidth = (0.5 * screenWidth) / 100;
-	int pHeight = (0.5 * screenHeight) / 100;
+	int pWidth = (int)(0.5 * screenWidth) / 100;
+	int pHeight = (int)(0.5 * screenHeight) / 100;
 
 	int movedX = 0;
 	int movedY = 0;
