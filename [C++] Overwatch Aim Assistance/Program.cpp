@@ -18,6 +18,7 @@
 
 #include <iostream>
 #include <Windows.h>
+#include <thread>
 
 #include "Capture.h"
 #include "Time.h"
@@ -35,7 +36,12 @@ int AimSpeed = 7; //Aim speed for human like movements (1-10)..
 bool Headshots = false; //Should we aim at the head?
 
 bool Triggerbot = false; //Should we enable the trigger bot? Not recommended in certain maps
-int BurstShootTime = 100; //Amount of time to hold left click in ms. Varies depending on character being used.
+bool ShootAfterAiming = false; //Should we shoot after the aim assist locks onto a target?
+int ShootTime = 100; //Varies depending on character being used.
+
+//Function interfaces
+void moveSmooth(Mouse *m, int x, int y);
+void holdLeftClick(Mouse *m);
 
 int main(int argc, char* argv[])
 {
@@ -75,9 +81,11 @@ int main(int argc, char* argv[])
 
 	//======    Main Code    ======//
 	Screenshot screeny;
-	Mouse mousey(recorder.getWidth(), recorder.getHeight(), MouseSensitivity);
+	int width = recorder.getWidth();
+	int height = recorder.getHeight();
 	int x, y;
 	bool run = true;
+	Mouse mousey(width, height, MouseSensitivity);
 
 	while (run)
 	{
@@ -91,25 +99,45 @@ int main(int argc, char* argv[])
 		if (Triggerbot) //Only tested in training range
 		{
 			if (screeny.triggerBot())
-				mousey.click(BurstShootTime);
+			{
+				thread t(holdLeftClick, &mousey);
+				t.detach();
+			}
 		}
 
 		//======   AIMBOT   ======//
 		if (screeny.findPlayer(x, y, Headshots))
 		{
-			if(HumanLikeMovements)
-				mousey.moveSmooth(x, y, AimSpeed);
+			if (HumanLikeMovements)
+			{
+				mousey.terminateThreads();
+				thread t(moveSmooth, &mousey, x, y);
+				t.detach(); //detach better but inaccuracies :(
+			}
 			else
-				mousey.moveTo(x, y); //use moveSmooth for human like movements and omitt waitTillNextFrame				
+				mousey.moveTo(x,y);
 
-			//if (Triggerbot)
-				//mousey.click(BurstShootTime);
+			if (ShootAfterAiming)
+			{
+				thread t(holdLeftClick, &mousey);
+				t.detach();
+			}
 		}
 	}
 
 	screeny.FreeMemory();
 	Beep(1500, 500);
-	cout << "Press 'Enter' to close!";
+	cout << endl << "Press 'Enter' to close!";
 	cin.ignore();
 	return 0;
+}
+
+void moveSmooth(Mouse *m, int x, int y)
+{
+	m->moveSmooth(x,y,AimSpeed);
+}
+
+void holdLeftClick(Mouse *m)
+{
+	m->click(ShootTime);
 }

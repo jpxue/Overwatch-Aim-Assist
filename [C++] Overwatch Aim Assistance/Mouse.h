@@ -29,19 +29,24 @@ class Mouse
 private:
 	const float constant = 0.116f; //0.090 seems to work better sometimes
 	float mouseSensitivity = 15.0f; //found in game menu
-	float modifier; //modifier = sens*const. Calculated on construction so as to eliminate recalculation
+	float modifier = 0.0f; //modifier = sens*const.
+	
+	bool suspendThreads = false;
+	int threads = 0;
 
-	float widthTol, heightTol; //Calculated on construction for moveSmooth
 	int screenWidth, screenHeight;
 	int centreScreenX, centreScreenY;
-	
 	void calibrateCoordinates(int &x, int &y); //Returns screen coords based on sensitivity and modifier.
 
 public:
+	Mouse();
 	Mouse(int captureWidth, int captureHeight, const float sensitivity);
+	Mouse::~Mouse();
+
+	void terminateThreads();
 	void moveTo(int x, int y);
-	void Mouse::moveSmooth(int x, int y, int aimSpeed);
-	void click(int leftDownMS);
+	void moveSmooth(int x, int y, int moveSpeed);
+	void click(int ms);
 
 };
 

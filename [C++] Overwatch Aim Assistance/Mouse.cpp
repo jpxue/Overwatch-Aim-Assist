@@ -18,6 +18,10 @@
 
 #include "Mouse.h"
 
+Mouse::Mouse()
+{
+}
+
 Mouse::Mouse(int captureWidth, int captureHeight, const float sensitivity)
 {
 	screenWidth = captureWidth;
@@ -29,45 +33,59 @@ Mouse::Mouse(int captureWidth, int captureHeight, const float sensitivity)
 	modifier = mouseSensitivity*constant;
 }
 
-const float PI = 3.1415927;
+Mouse::~Mouse()
+{
+}
 
 /* Calculates actual coordinates for mouse movement based on sensitivity and a constant. */
 void Mouse::calibrateCoordinates(int &x, int &y)
 {
-	x = x - centreScreenX;
-	y = y - centreScreenY;
+	if (abs(x) < 5)
+		x = 0;
+	else {
+		x = x - centreScreenX;
+		x = (int)((float)x / modifier);
+	}
 
-	x = (int)((float)x / modifier);
-	y = (int)((float)y / modifier);
+	if (abs(y) < 5)
+		y = 0;
+	else
+	{
+		y = y - centreScreenY;
+		y = (int)((float)y / modifier);
+	}
 }
 
 /* Moves to x,y coordinates after processed into actual coordinates (based on sensitivity and const). */
 void Mouse::moveTo(int x, int y)
 {
-	calibrateCoordinates(x, y);
+	calibrateCoordinates(x,y);
 	mouse_event(MOUSEEVENTF_MOVE, x, y, 0, 0);
 	//std::cout << x << "," << y << std::endl;// << "      pred: " << predX << "," << predY << std::endl;
 }
 
 /* Mouse click @ 0,0 */
-void Mouse::click(int leftDownMS)
+void Mouse::click(int ms)
 {
 	mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
-	Sleep(leftDownMS);
+	Sleep(ms);
 	mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
 }
 
-void Mouse::moveSmooth(int x, int y, int aimSpeed)
+void Mouse::moveSmooth(int x, int y, int moveSpeed)
 {
-	calibrateCoordinates(x, y);
-	int pWidth = (0.5 * screenWidth) / 100;
-	int pHeight = (0.5 * screenHeight) / 100;
+	while (suspendThreads) Sleep(1); //Do not start until prev threads are suspended
+	threads++;
+
+	calibrateCoordinates(x,y);
+	int pWidth = (int)(0.5 * screenWidth) / 100;
+	int pHeight = (int)(0.5 * screenHeight) / 100;
 
 	int movedX = 0;
 	int movedY = 0;
 
 	int steps = abs(x) + abs(y);
-	int sleep = 10-aimSpeed;
+	int ms = 10 - moveSpeed;
 
 	float divX = (float)x / (float)steps;
 	float divY = (float)y / (float)steps;
@@ -76,18 +94,25 @@ void Mouse::moveSmooth(int x, int y, int aimSpeed)
 	float Y = 0.0f;
 	for (int i = 0; i < steps; i++)
 	{
+		if (suspendThreads)
+		{
+			threads--;
+			suspendThreads = false;
+			return;
+		}
+
 		X += divX;
 		Y += divY;
 		if (X > 1.0f || X < 1.0f) //1 pixel is the smallest absolute value that we can move
 		{
-			movedX += abs(X);
+			movedX += (int)abs(X);
 			mouse_event(MOUSEEVENTF_MOVE, int(X), 0, 0, 0);
 			X -= int(X); //we do not want to lose the remainder -> leads to inaccuracies of lost
 		}
 
 		if (Y > 1.0f || Y < 1.0f) //^
 		{
-			movedY += abs(Y);
+			movedY += (int)abs(Y);
 			mouse_event(MOUSEEVENTF_MOVE, 0, int(Y), 0, 0);
 			Y -= int(Y); //^
 		}
@@ -95,12 +120,19 @@ void Mouse::moveSmooth(int x, int y, int aimSpeed)
 		if (movedX >= pWidth)
 		{
 			movedX = 0;
-			Sleep(sleep);
+			Sleep(ms);
 		}
 		if (movedY >= pHeight)
 		{
 			movedY = 0;
-			Sleep(sleep);
+			Sleep(ms);
 		}
 	}
+
+	suspendThreads = false;
+	threads--;
+}
+
+void Mouse::terminateThreads() {
+	suspendThreads = (threads > 0) ? true : false;
 }
