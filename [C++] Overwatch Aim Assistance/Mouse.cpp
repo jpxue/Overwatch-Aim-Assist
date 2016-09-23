@@ -18,10 +18,6 @@
 
 #include "Mouse.h"
 
-Mouse::Mouse()
-{
-}
-
 Mouse::Mouse(int captureWidth, int captureHeight, const float sensitivity)
 {
 	screenWidth = captureWidth;
@@ -31,10 +27,6 @@ Mouse::Mouse(int captureWidth, int captureHeight, const float sensitivity)
 	mouseSensitivity = sensitivity;
 
 	modifier = mouseSensitivity*constant;
-}
-
-Mouse::~Mouse()
-{
 }
 
 /* Calculates actual coordinates for mouse movement based on sensitivity and a constant. */
@@ -77,7 +69,8 @@ void Mouse::moveSmooth(int x, int y, int moveSpeed)
 	while (suspendThreads) Sleep(1); //Do not start until prev threads are suspended
 	threads++;
 
-	calibrateCoordinates(x,y);
+	calibrateCoordinates(x, y);
+
 	int pWidth = (int)(0.5 * screenWidth) / 100;
 	int pHeight = (int)(0.5 * screenHeight) / 100;
 

@@ -39,9 +39,7 @@ private:
 	void calibrateCoordinates(int &x, int &y); //Returns screen coords based on sensitivity and modifier.
 
 public:
-	Mouse();
 	Mouse(int captureWidth, int captureHeight, const float sensitivity);
-	Mouse::~Mouse();
 
 	void terminateThreads();
 	void moveTo(int x, int y);
