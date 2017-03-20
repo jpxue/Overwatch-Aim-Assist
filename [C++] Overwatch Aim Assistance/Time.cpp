@@ -33,11 +33,12 @@ double Time::timerStop()
 string Time::getDate(char delimiter)
 {
 	time_t t = time(0);   //now
-	struct tm *now = localtime(&t);
+	struct tm now;
+	localtime_s(&now, &t);//error C4996 fix
 
 	ostringstream ss; //use iss or oss and NOT ss (bulkier)
-	ss << now->tm_mday << delimiter << (now->tm_mon + 1)
-		<< delimiter << (now->tm_year + 1900);
+	ss << now.tm_mday << delimiter << (now.tm_mon + 1)
+		<< delimiter << (now.tm_year + 1900);
 
 	return ss.str();
 }
@@ -45,10 +46,11 @@ string Time::getDate(char delimiter)
 string Time::getTime(char delimiter)
 {
 	time_t t = time(0);
-	struct tm *now = localtime(&t);
+	struct tm now;
+	localtime_s(&now, &t);//error C4996 fix
 
 	ostringstream ss;
-	ss << now->tm_hour << delimiter << now->tm_min << delimiter << now->tm_sec;
+	ss << now.tm_hour << delimiter << now.tm_min << delimiter << now.tm_sec;
 
 	return ss.str();
 }
