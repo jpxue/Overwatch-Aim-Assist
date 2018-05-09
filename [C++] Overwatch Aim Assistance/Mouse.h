@@ -29,7 +29,7 @@ class Mouse
 private:
 	const float constant = 0.116f; //0.090 seems to work better sometimes
 	float mouseSensitivity = 15.0f; //found in game menu
-	float modifier = 0.116f; //modifier = sens*const.
+	float modifier = 0.0f; //modifier = sens*const. Calculated on init()
 	
 	bool suspendThreads = false;
 	int threads = 0;
