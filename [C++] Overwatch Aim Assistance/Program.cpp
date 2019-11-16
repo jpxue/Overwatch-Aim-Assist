@@ -33,9 +33,9 @@ char* WindowName = "Overwatch"; //IMP: if overwatch is not detected your window 
 float MouseSensitivity = 15.00f; //Change this to your sensivity.
 bool HumanLikeMovements = true; //Should we use human like mouse movements?
 int AimSpeed = 7; //Aim speed for human like movements (1-10)..
-bool Headshots = false; //Should we aim at the head?
+bool Headshots = true; //Should we aim at the head?
 
-bool Triggerbot = false; //Should we enable the trigger bot? Not recommended in certain maps
+bool Triggerbot = true; //Should we enable the trigger bot? Not recommended in certain maps
 bool ShootAfterAiming = false; //Should we shoot after the aim assist locks onto a target?
 int ShootTime = 100; //Varies depending on character being used.
 
